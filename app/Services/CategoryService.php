@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Interfaces\Category\ICategoryRepository;
-use App\Models\Category;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
+use App\Interfaces\Category\ICategoryService;
 
-class CategoryService
+class CategoryService implements ICategoryService
 {
     protected $categoryRepository;
 
@@ -16,8 +14,18 @@ class CategoryService
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function paginate()
+    public function getAll()
     {
-        return $this->categoryRepository->paginate();
+        return $this->categoryRepository->getAll();
+    }
+
+    public function getBySlug($slug)
+    {
+        return $this->categoryRepository->getBySlug($slug);
+    }
+
+    public function getWithProduct($limitedCategories, $limitedProducts)
+    {
+        return $this->categoryRepository->getWithProduct($limitedCategories, $limitedProducts);
     }
 }
