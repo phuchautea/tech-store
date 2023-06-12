@@ -5,6 +5,10 @@ namespace App\Services;
 use App\Interfaces\Product\IProductRepository;
 use App\Interfaces\Product\IProductService;
 use App\Interfaces\ProductVariant\IProductVariantService;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class ProductService implements IProductService
 {
@@ -22,6 +26,11 @@ class ProductService implements IProductService
     public function getAll()
     {
         return $this->productRepository->getAll();
+    }
+
+    public function getAllPaginate($paginate)
+    {
+        return $this->productRepository->getAllPaginate($paginate);
     }
 
     public function getById($id)
@@ -56,7 +65,7 @@ class ProductService implements IProductService
                 });
             case 'price-descending':
                 return $products->load(['variants' => function ($query) {
-                    $query->orderBy('price', 'desc');
+                    $query->orderBy('price', 'asc');
                 }])
                 ->sortByDesc(function ($product) {
                     return optional($product->variants)->first()->price ?? 0;
@@ -95,5 +104,67 @@ class ProductService implements IProductService
     public function getByCategoryAndParentPaginate($categoryId, $paginate = 5)
     {
         return $this->productRepository->getByCategoryAndParentPaginate($categoryId, $paginate);
+    }
+    public function storeProductWithVariants($productData, $variantData)
+    {
+        $product = self::store($productData);
+        if($product) {
+            $productId = $product->id;
+            // Lưu danh sách các variant với productId tương ứng
+            foreach ($variantData as $variant) {
+                $variant['product_id'] = $productId;
+                $this->productVariantService->store($variant);
+            }
+            return true;
+        }
+        return false;
+    }
+    public function store($request)
+    {
+        try {
+            $storeProduct = $this->productRepository->store([
+                'name' => (string)$request['name'],
+                'slug' => Str::slug($request['name'], '-'),
+                'description' => (string)$request['description'],
+                'image' => (string)$request['image'],
+                'category_id' => (string)$request['category_id'],
+                'status' => "1",
+            ]);
+            Session::flash('success', 'Thêm sản phẩm thành công');
+            return $storeProduct;
+        } catch (\Exception $ex) {
+            Session::flash('error', $ex->getMessage());
+        }
+    }
+    public function updateProductWithVariants($productData, $variantData, $product)
+    {
+        $product = self::update($productData, $product);
+        if($product) {
+            $productId = $product->id;
+            // Lưu danh sách các variant với productId tương ứng
+            foreach ($variantData as $variant) {
+                $variant['product_id'] = $productId;
+                $this->productVariantService->update($variant);
+            }
+            return true;
+        }
+        return false;
+    }
+    public function update(Request $request, Product $product)
+    {
+        $data = $request->input();
+        return $this->productRepository->update($data, $product);
+    }
+
+    public function remove($request)
+    {
+        $id = (int)$request->input('id');
+        return $this->productRepository->remove($id);
+    }
+
+    public function status($status = 0): string
+    {
+        return $status == 0 ? '<span class="btn btn-danger btn-xs">TẮT</span>'
+            : '<span class="btn btn-success btn-xs">BẬT</span>';
     }
 }
