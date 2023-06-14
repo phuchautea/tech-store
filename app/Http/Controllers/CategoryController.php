@@ -42,7 +42,7 @@ class CategoryController extends Controller
             $products = $this->productService->getByCategoryAndParent($category->id);
 
             if (!empty($sortBy)) {
-                $products = $this->productService->getByCategoryAndParentPaginate($category->id);
+                $products = $this->productService->getByCategoryAndParent($category->id);
             }
 
             $products = $this->productService->sortProducts($products, $sortBy);
