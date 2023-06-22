@@ -46,8 +46,8 @@
 
     .fcta-zalo-vi-tri-nut {
         position: fixed;
-        bottom: 80px;
-        right: 18px;
+        bottom: 100px;
+        right: 20px;
         z-index: 999
     }
 
@@ -56,8 +56,8 @@
     }
 
     .fcta-zalo-nen-nut {
-        width: 50px;
-        height: 50px;
+        width: 56px;
+        height: 56px;
         text-align: center;
         color: #fff;
         background: #0068ff;
@@ -69,15 +69,15 @@
     .fcta-zalo-nen-nut::before {
         content: "";
         position: absolute;
-        border: 1px solid #0068ff;
-        background: #0068ff80;
+        /* border: 1px solid #0068ff; */
+        /* background: #0068ff80; */
         z-index: -1;
         left: -20px;
         right: -20px;
         top: -20px;
         bottom: -20px;
         border-radius: 50%;
-        animation: zoom 1.9s linear infinite
+        /* animation: zoom 1.9s linear infinite */
     }
 
     .fcta-zalo-nen-nut::after {
